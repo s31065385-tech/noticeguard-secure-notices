@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## NoticeGuard architecture
+
+- All data access goes through the `NoticeGuardApi` interface in `src/lib/api`; `VITE_NOTICEGUARD_API_URL` selects the FastAPI adapter, otherwise the IndexedDB demo adapter — so the UI never changes when the backend is connected.
+- The FastAPI contract lives in `docs/fastapi-integration.md`; keep `src/lib/api/backend.ts` and that doc in sync.
+- QR access and signature verification stay separate code paths: opening a notice by QR must never set or imply a verified state — verification only runs from an explicit user action.
+- Demo-mode results carry `simulated: true` and must be visibly labelled; never present them as production proof.
+- Crypto uses Web Crypto (SHA-256, ECDSA P-256) in `src/lib/crypto.ts`; it is covered by `src/lib/crypto.test.ts` (node environment, since jsdom lacks SubtleCrypto).
+- Routes that read browser storage (IndexedDB/sessionStorage) set `ssr: false`.
